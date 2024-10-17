@@ -2,6 +2,7 @@
 
 import pathlib
 import json
+import git
 
 benchmarks = {"commits": [], "results": {}}
 commits = []
@@ -32,7 +33,22 @@ for file in pathlib.Path("results").glob("*.json"):
 with open("index.html.template", "r", encoding="utf-8") as f:
     html = f.read()
 
-benchmarks["commits"] = [commit for commit in sorted(commits, key=lambda tup: tup[1])]
+repo = git.Repo.init("~/Projects/bpfilter")
+
+for commit, date in sorted(commits, key=lambda tup: tup[1]):
+    try:
+        message = repo.commit(commit).message
+    except:
+        message = "<Not committed yet>"
+
+    benchmarks["commits"].append(
+        {
+            "sha": commit,
+            "date": date,
+            "message": message,
+        }
+    )
+
 benchmarks["benchNames"] = list(dict.fromkeys(benchNames))
 
 with open("index.html", "w", encoding="utf-8") as f:
