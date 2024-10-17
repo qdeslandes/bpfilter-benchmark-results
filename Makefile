@@ -2,7 +2,7 @@ BF_SRC_DIR=~/Projects/bpfilter
 BASE_COMMIT=670b8bb
 
 .ONESHELL:
-genlast: | dirs
+genlast: | results
 	BF_BUILD_DIR=$$(mktemp -d)
 	sudo cpupower frequency-set --governor performance
 	cmake -S $(BF_SRC_DIR) -B $${BF_BUILD_DIR} -DCMAKE_BUILD_TYPE=debug -DENABLE_BENCHMARK:BOOK=on
@@ -10,7 +10,7 @@ genlast: | dirs
 	cp $${BF_BUILD_DIR}/output/*.json results/
 	./genhtml
 
-genall: | dirs
+genall: | results
 	BF_BUILD_DIR=$$(mktemp -d)
 	sudo cpupower frequency-set --governor performance
 	cmake -S $(BF_SRC_DIR) -B $${BF_BUILD_DIR} -DCMAKE_BUILD_TYPE=debug -DENABLE_BENCHMARK:BOOK=on
@@ -18,9 +18,9 @@ genall: | dirs
 	cp $${BF_BUILD_DIR}/output/*.json results/
 	./genhtml
 
-dirs:
-	@mkdir -p results build
+results:
+	@mkdir -p results
 
 serve:
 	@printf '\e]8;;http://bf-bench-1:8000\e\\Click to open the results\e]8;;\e\\\n'
-	python -m http.server --directory build
+	python -m http.server
