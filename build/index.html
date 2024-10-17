@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>bpfilter benchmarks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            render();
+        })
+
+        const data = {"commits": [["670b8bb", "1729159769"]], "results": {"firstRuleDropCounter": {"670b8bb": {"iters": 53000000, "time": 13.235147415060673, "nInsn": 622.0}}, "dropAfterXRules/8": {"670b8bb": {"iters": 54000000, "time": 12.454483629510463, "nInsn": 657.0}}, "dropAfterXRules/32": {"670b8bb": {"iters": 56000000, "time": 12.490432232360554, "nInsn": 777.0}}, "dropAfterXRules/128": {"670b8bb": {"iters": 36000000, "time": 19.572078527643395, "nInsn": 1260.0}}, "dropAfterXRules/512": {"670b8bb": {"iters": 13000000, "time": 56.440276538174096, "nInsn": 3180.0}}, "dropAfterXRules/2048": {"670b8bb": {"iters": 4000000, "time": 200.79450800039922, "nInsn": 10860.0}}}, "benchNames": ["firstRuleDropCounter", "dropAfterXRules/8", "dropAfterXRules/32", "dropAfterXRules/128", "dropAfterXRules/512", "dropAfterXRules/2048"]}
+
+        function render() {
+            for (const benchName of data.benchNames)
+                makeChart(benchName, data.commits, data.results[benchName])
+        }
+
+        function makeChart(name, commits, results) {
+            const ctx = document.getElementById('charts');
+            ctx.insertAdjacentHTML("beforeend",
+                `<div class="grid-element" id="${name}"><h3 class="roboto-light">${name}</h3></div>`
+            );
+
+            const chartCtx = document.getElementById(name);
+            chartCtx.insertAdjacentHTML("beforeend",
+                `<canvas id="${name}Chart"></canvas>`
+            );
+
+            var durations = []
+            var nInsns = []
+            var labels = []
+            for (commit of commits) {
+                const result = results[commit[0]]
+                if (result == undefined) {
+                    durations.push(null);
+                    nInsns.push(null);
+                } else {
+                    durations.push(result.time);
+                    nInsns.push(result.nInsn);
+                }
+
+                labels.push(commit[0]);
+            }
+
+            new Chart(document.getElementById(name + "Chart"), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Duration',
+                            data: durations,
+                            yAxisID: 'yAxis0',
+                            tension: 0.1,
+                            fill: true,
+                        },
+                        {
+                            label: 'Number of instructions',
+                            data: nInsns,
+                            yAxisID: 'yAxis1',
+                            tension: 0.1,
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        yAxis0: {
+                            id: 't (ns)',
+                            type: 'linear',
+                            position: 'left',
+                            min: 0,
+                            title: {
+                                display: true,
+                                text: 'ns'
+                            },
+                        },
+                        yAxis1: {
+                            id: '# insn',
+                            type: 'linear',
+                            position: 'right',
+                            min: 0,
+                            title: {
+                                display: true,
+                                text: '# insn'
+                            },
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Commit'
+                            },
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    <style>
+        #title {
+            text-align: center;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .grid-element {
+            padding: 20px;
+        }
+
+        .roboto-thin {
+            font-family: "Roboto", sans-serif;
+            font-weight: 100;
+            font-style: normal;
+        }
+
+        .roboto-light {
+            font-family: "Roboto", sans-serif;
+            font-weight: 300;
+            font-style: normal;
+        }
+
+        .roboto-regular {
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .roboto-medium {
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        .roboto-bold {
+            font-family: "Roboto", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        .roboto-black {
+            font-family: "Roboto", sans-serif;
+            font-weight: 900;
+            font-style: normal;
+        }
+
+        .roboto-thin-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 100;
+            font-style: italic;
+        }
+
+        .roboto-light-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .roboto-regular-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .roboto-medium-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .roboto-bold-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .roboto-black-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 900;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="roboto-medium" id="title">bpfilter benchmarks</h1>
+    <div class="grid-container" id="charts">
+    </div>
+</body>
+
+</html>
