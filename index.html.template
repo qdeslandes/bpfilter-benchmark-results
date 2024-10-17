@@ -116,12 +116,14 @@
                             yAxisID: 'duration',
                             tension: 0.1,
                             fill: true,
+                            order: 2,
                         },
                         {
                             label: '# of instructions',
                             data: nInsns,
                             yAxisID: 'instructions',
                             tension: 0.1,
+                            order: 1,
                         }
                     ]
                 },
