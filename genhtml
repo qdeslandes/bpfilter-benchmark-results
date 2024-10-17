@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+import pathlib
+import json
+
+benchmarks = {"commits": [], "results": {}}
+commits = []
+benchNames = []
+
+for file in pathlib.Path("results").glob("*.json"):
+    with open(file, "r", encoding="utf-8") as f:
+        d = json.load(f)
+
+        gitrev = d["context"]["gitrev"]
+        gitdate = d["context"]["gitdate"]
+        commits.append((gitrev, gitdate))
+
+        for bench in d["benchmarks"]:
+            benchNames.append(bench["name"])
+            if bench["name"] not in benchmarks["results"]:
+                benchmarks["results"][bench["name"]] = {}
+
+            benchmarks["results"][bench["name"]][gitrev] = {
+                "iters": bench["iterations"],
+                "time": bench["real_time"],
+                "nInsn": bench.get("nInsn", 0),
+            }
+
+            if bench["time_unit"] != "ns":
+                print("ERROR: time not in 'ns'!")
+
+with open("index.html.template", "r", encoding="utf-8") as f:
+    html = f.read()
+
+benchmarks["commits"] = [commit for commit in sorted(commits, key=lambda tup: tup[1])]
+benchmarks["benchNames"] = list(dict.fromkeys(benchNames))
+
+with open("build/index.html", "w", encoding="utf-8") as f:
+    f.write(html.replace("{{ DATA }}", json.dumps(benchmarks)))
