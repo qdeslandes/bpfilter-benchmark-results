@@ -1,5 +1,5 @@
 BF_SRC_DIR=~/Projects/bpfilter
-BASE_COMMIT=d7fc168
+BASE_COMMIT=670b8bb
 
 .ONESHELL:
 genlast: | dirs
