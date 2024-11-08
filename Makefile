@@ -24,3 +24,8 @@ results:
 serve:
 	@printf '\e]8;;http://bf-bench-1:8000\e\\Click to open the results\e]8;;\e\\\n'
 	python -m http.server
+
+commit:
+	git add -A
+	git commit -m"Update results and index.html"
+	git push
